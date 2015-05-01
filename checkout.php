@@ -196,6 +196,18 @@ $create_resp_obj = json_decode($view_response);
     
     <form action="./cart.php" method="post" id="final_checkout" name="final_checkout">
         
+        <!--
+        <h3>Ship To:</h3>
+        <p>
+            <?php //echo $create_resp_obj->customer_info->shipping_address->first_name." ".$create_resp_obj->customer_info->shipping_address->last_name  ?><br />
+            <?php //echo $create_resp_obj->customer_info->shipping_address->company_name ?><br />
+            <?php //echo $create_resp_obj->customer_info->shipping_address->address1 ?> <?php //echo $create_resp_obj->customer_info->shipping_address->address2 ?><br />
+            <?php //echo $create_resp_obj->customer_info->shipping_address->city ?>, <?php //echo $create_resp_obj->customer_info->shipping_address->state ?>         <?php //echo $create_resp_obj->customer_info->shipping_address->postal_code ?>
+        </p>
+        <p><?php //echo $create_resp_obj->customer_info->email->email ?></p>
+        <p><?php //echo $create_resp_obj->customer_info->phone->country_code ?>-<?php //echo $create_resp_obj->customer_info->phone->area_code ?>-<?php //echo $create_resp_obj->customer_info->phone->number ?></p>
+        -->
+        
         <h3>Enter Billing Address</h3>
 
         <div class="row">
