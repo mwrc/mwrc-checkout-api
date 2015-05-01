@@ -252,6 +252,10 @@ $create_resp_obj = json_decode($view_response);
                     <label for="country">Country</label>
                     <input type="text" class="form-control" id="country" placeholder="country" value="US">
                 </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" class="form-control" id="country" placeholder="country" value="US">
+                </div>
 
 
                 
