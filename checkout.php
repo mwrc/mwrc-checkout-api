@@ -5,26 +5,28 @@ require_once("includes/functions.inc.php");
 
 $api_endpoint = "http://leki-store.devel2.mwrc.net/services/cart.php"; 
 
-if(count($_POST)) {
+if(count($_POST))
+{
+    extract($_POST);
     
     $data = array();
         
     $data["billing_shipping_same"] = "no";
     
-    $data["billing"]["first_name"] = "Dan - API";
-    $data["billing"]["last_name"] = "Schultz";
-    $data["billing"]["company_name"] = "API TEST2 - Billing Diff";
-    $data["billing"]["address1"] = "101 Test Ave";
-    $data["billing"]["address2"] = "#807";
-    $data["billing"]["city"] = "Culver City";
-    $data["billing"]["state"] = "CA";
-    $data["billing"]["postal_code"] = "90230";
-    $data["billing"]["country"] = "US";
+    $data["billing"]["first_name"] = stripslashes($first_name);
+    $data["billing"]["last_name"] = stripslashes($last_name);
+    $data["billing"]["company_name"] = stripslashes($company_name);
+    $data["billing"]["address1"] = stripslashes($address1);
+    $data["billing"]["address2"] = stripslashes($address2);
+    $data["billing"]["city"] = stripslashes($city);
+    $data["billing"]["state"] = stripslashes($state);
+    $data["billing"]["postal_code"] = stripslashes($postal_code);
+    $data["billing"]["country"] = stripslashes($country);
 
-    $data["card"]["card_encrypt"] = $_POST["enc_data"];
+    $data["card"]["card_encrypt"] = stripslashes($_POST["enc_data"]);
             
     $data_string = json_encode( $data );
-
+// print $api_endpoint."?action=checkout";
     $ch=curl_init();
 	curl_setopt($ch, CURLOPT_URL, $api_endpoint."?action=checkout");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -32,24 +34,27 @@ if(count($_POST)) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
     
-	if (isset($_COOKIE['mwrc_session_code_1_1'])) {
-    	$cookie = "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
-    	$cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
-	    curl_setopt($ch, CURLOPT_COOKIE, $cookie);
-    }
+    $cookie="";
+	if (!empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
+  	if(!empty($_COOKIE["mwrc_secure_session_code"])) $cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
 
+    curl_setopt($ch, CURLOPT_COOKIE, $cookie);  	
+    
   	$checkout_response=curl_exec($ch);	
 	$error = curl_error($ch);
 	  	
     $info = curl_getinfo($ch);
-	  	
-//         print_r($info);
-    print_r($checkout_response);
-    exit;
     
 	$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
 	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 	curl_close($ch);
+	
+	
+//     print_r($info);
+    print_r($checkout_response);
+    exit;
+
+	
 }
 
 /*
@@ -77,12 +82,18 @@ curl_close($ch);
 
 $create_resp_obj = json_decode($view_response);
 
+if( ! $create_resp_obj->session_order_id) {
+    header("Location: cart.php");
+    exit;   
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <?php require_once("includes/sessions.inc.php"); ?>        
     
     <title>LEKI - Cart</title>
     
@@ -157,7 +168,7 @@ $create_resp_obj = json_decode($view_response);
         
     
     
-    <?php if(!empty($_COOKIE["checkout_step2"]) && !empty($create_resp_obj)): ?>
+    <?php if( ! empty($create_resp_obj)): ?>
     
     <h2>CHECKOUT</h2>
     <h3>Order id: <?php echo (string)$create_resp_obj->session_order_id ?></h3>
@@ -194,7 +205,7 @@ $create_resp_obj = json_decode($view_response);
         Total: <?php echo $create_resp_obj->cart_summary->totals->grand_total ?>
     </p>
     
-    <form action="./cart.php" method="post" id="final_checkout" name="final_checkout">
+    <form action="./checkout.php" method="post" id="final_checkout" name="final_checkout">
         
         <!--
         <h3>Ship To:</h3>
@@ -214,7 +225,7 @@ $create_resp_obj = json_decode($view_response);
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="company_name">Company Name</label>
-                    <input type="text" class="form-control" id="company_name" placeholder="Company Name">
+                    <input type="text" class="form-control" id="company_name" placeholder="Company Name" name="company_name">
                 </div>
             </div>
         </div>
@@ -223,23 +234,23 @@ $create_resp_obj = json_decode($view_response);
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="first_name">First Name</label>
-                    <input type="text" class="form-control" id="first_name" placeholder="First Name" value="John">
+                    <input type="text" class="form-control" id="first_name" placeholder="First Name" name="first_name" value="John">
                 </div>
 
 
                 <div class="form-group">
                     <label for="address1">Address 1</label>
-                    <input type="text" class="form-control" id="address1" placeholder="Address 1" value="1234 Test Ave.">
+                    <input type="text" class="form-control" id="address1" placeholder="Address 1" name="address1" value="1234 Test Ave.">
                 </div>
 
                 <div class="form-group">
                     <label for="city">City</label>
-                    <input type="text" class="form-control" id="city" placeholder="city" value="Culver City">
+                    <input type="text" class="form-control" id="city" placeholder="city" name="city" value="Culver City">
                 </div>
 
                 <div class="form-group">
                     <label for="postal_code">Zip</label>
-                    <input type="text" class="form-control" id="postal_code" placeholder="postal_code" value="90230">
+                    <input type="text" class="form-control" id="postal_code" placeholder="postal_code" name="postal_code" value="90230">
                 </div>
                 
             </div>
@@ -247,22 +258,22 @@ $create_resp_obj = json_decode($view_response);
                 
                 <div class="form-group">
                     <label for="last_name">Last Name</label>
-                    <input type="text" class="form-control" id="last_name" placeholder="Last Name" value="Doe">
+                    <input type="text" class="form-control" id="last_name" placeholder="Last Name" name="last_name" value="Doe">
                 </div>
                 
                 <div class="form-group">
                     <label for="address1">Address 2</label>
-                    <input type="text" class="form-control" id="address2" placeholder="Address 2">
+                    <input type="text" class="form-control" id="address2" placeholder="Address 2" name="address2">
                 </div>
 
                 <div class="form-group">
                     <label for="state">State</label>
-                    <input type="text" class="form-control" id="state" placeholder="state" value="CA">
+                    <input type="text" class="form-control" id="state" placeholder="state" name="state" value="CA">
                 </div>
 
                 <div class="form-group">
                     <label for="country">Country</label>
-                    <input type="text" class="form-control" id="country" placeholder="country" value="US">
+                    <input type="text" class="form-control" id="country" placeholder="country" name="country" value="US">
                 </div>
                 
             </div>
@@ -276,12 +287,12 @@ $create_resp_obj = json_decode($view_response);
         
         <div class="form-group">
             <label for="card_number">Card Number</label>
-            <input type="text" class="form-control" id="card_number" placeholder="Card Number">
+            <input type="text" class="form-control" id="card_number" placeholder="Card Number" maxlength="16">
         </div>
         
         <div class="form-group">
             <label for="card_cvv">Card CVV</label>
-            <input type="text" class="form-control" id="card_cvv" placeholder="Card CVV">
+            <input type="text" class="form-control" id="card_cvv" placeholder="Card CVV" maxlength="4">
         </div>
        
         <div class="form-group">

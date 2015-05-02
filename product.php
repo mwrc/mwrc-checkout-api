@@ -197,7 +197,8 @@ if(have_mwrc_session())
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <?php require_once("includes/functions.inc.php"); ?>    
+    
+    <?php require_once("includes/sessions.inc.php"); ?>    
         
     <title>LEKI - <?php echo (!empty($brandProduct->name) ? " - ".$brandProduct->name : ""); ?></title>
     

@@ -31,7 +31,7 @@ foreach($request_params as $param=>$val) $params[] = $param."=".$val;
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-     <?php require_once("includes/sessions.inc.php"); ?>        
+     <?php require_once("includes/sessions.inc.php"); ?>
     
     <title>Channel Islands - <?php echo (strlen($category->name))?" - ".$category->name:""; ?></title>
 
@@ -41,9 +41,9 @@ foreach($request_params as $param=>$val) $params[] = $param."=".$val;
     <!-- Optional theme -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     
-    <link rel="stylesheet" type="text/css" href="css/main.css" media="all" charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/css/main.css" media="all" charset="utf-8" />
     
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     
     <script type="text/javascript">
   	  var mwrc_widget_config = {
@@ -86,18 +86,16 @@ if((int)$category["category_id"]>0) array_push($parent_cats, array("cat_id"=>(in
 
 ?>
 
-    <h1>Channel Islands Catalog</h1>
+<h1>Channel Islands Catalog</h1>
 
-        <div class="cart_container">
-            <a href="<?php echo $mwrc_retailer_domain ?>/en/shopping-cart.php">
-              <span id="mwrc_cart_qty"></span> items <!-- Example output: 2 -->
-              <span id="mwrc_cart_subtotal"></span> <!-- Example output: $59.99 --> | 
-              <a id="mwrc_checkout_link">Checkout</a> | 
-              <a id="mwrc_account_link">Account</a>
-            </a>
-        </div>
-
-
+    <div class="cart_container">
+        <a href="<?php echo $mwrc_retailer_domain ?>/en/shopping-cart.php">
+          <span id="mwrc_cart_qty"></span> items <!-- Example output: 2 -->
+          <span id="mwrc_cart_subtotal"></span> <!-- Example output: $59.99 --> | 
+          <a id="mwrc_checkout_link">Checkout</a> | 
+          <a id="mwrc_account_link">Account</a>
+        </a>
+    </div>
 
 <?php if(count($parent_cats)): ?>
 <ul class="bread_crumbs">

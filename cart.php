@@ -69,16 +69,18 @@ exit;
     	$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
     	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
     	curl_close($ch);
-    	/*
-            header("Content-Type: ".$contentType);
+
+//             header("Content-Type: ".$contentType);
         //     echo $contentType;
+/*
         	print "http status:\n";
         	print $http_status."\n\n";
         	
         // 	print "Response: <br />";
             print $create_response;
             exit;
-        */
+*/
+       
         
         	
         //     $info = curl_getinfo ($ch);	
@@ -103,17 +105,26 @@ exit;
     	if($http_status==200) {
         
             $create_resp_obj = json_decode($create_response);
+
+            if($create_resp_obj->success==1) {
+                
+                setcookie("mwrc_session_code_1_1", $create_resp_obj->session_code, 0, "/");
+            	$_COOKIE["mwrc_session_code_1_1"] = $create_resp_obj->session_code;
+                
+            	setcookie("mwrc_secure_session_code", $create_resp_obj->secure_session_code, 0, "/");
+            	$_COOKIE["mwrc_secure_session_code"] = $create_resp_obj->secure_session_code;
         
-            setcookie("mwrc_session_code_1_1", $create_resp_obj->session_code, 0, "/");
-        	$_COOKIE["mwrc_session_code_1_1"] = $create_resp_obj->session_code;
-            
-        	setcookie("mwrc_secure_session_code", $create_resp_obj->secure_session_code, 0, "/");
-        	$_COOKIE["mwrc_secure_session_code"] = $create_resp_obj->secure_session_code;
-    
-            header("Location: /checkout.php");
-            exit;
+                header("Location: /checkout.php");
+                exit;
+
+            }
+        
     	}
-			
+        else {
+            print "local/cart.php - ".__LINE__;
+            print_r($create_response);
+            exit;
+        }
 	
 // 	exit;
 }
@@ -143,8 +154,10 @@ $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 curl_close($ch);
 
 $view_resp_obj = json_decode($view_response, true);
-// print_r($view_resp_obj);
-// exit;
+/*
+print_r($view_resp_obj);
+exit;
+*/
 
 ?>
 
@@ -153,6 +166,8 @@ $view_resp_obj = json_decode($view_response, true);
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <?php require_once("includes/sessions.inc.php"); ?>        
     
     <title>LEKI - Cart</title>
     
@@ -196,6 +211,17 @@ $view_resp_obj = json_decode($view_response, true);
             <a href="index.php">Continue Shopping</a>
         </div>
         <hr />
+        
+        <?php if( ! empty($create_resp_obj->message->errors)): ?>
+        
+        <div class="alert alert-danger" role="alert">
+            <?php foreach($create_resp_obj->message->errors as $error): ?>
+            <p><?php echo $error->product_identifier." ".$error->error_msg; ?></p>
+            <?php endforeach; ?>
+        </div>
+        
+        <?php endif; ?>
+        
         <h3>Current Cart</h3>
         
         <br />
@@ -248,7 +274,7 @@ $view_resp_obj = json_decode($view_response, true);
         
         <div class="clear"></div>
 
-        <button class="btn btn-primary pull-right" type="submit">Checkout</button>
+        <a href="checkout.php" class="btn btn-primary pull-right">Checkout</a>
         
         <div class="clear"></div>
 
@@ -260,21 +286,11 @@ $view_resp_obj = json_decode($view_response, true);
         
     <hr />
     
-    <?php if(empty($create_resp_obj)): ?>
-
-    <h2>Create new order</h2>
+    <h2>Add items to your cart</h2>
     <p>Fill out the form below and submit to add products to create a new shopping cart/order</p>
     <p>If zip code is not provided, retailer will default to distribution center</p>
     <form action="./cart.php" method="post">
-<!--
-        $data["items"][0]["product_id"] = 0;
-        $data["items"][0]["exact_product_id"] = 0;
-        $data["items"][0]["full_sku"] = "T6322274";
-        $data["items"][0]["quantity"] = 1;
-        $data["items"][0]["unit_price"] = 139.95;
-        $data["items"][0]["unit_price_discount"] = 0;
-        $data["items"][0]["price"] = 139.95;
--->
+
         <table class="table">
             <thead>
                 <tr>
@@ -305,103 +321,6 @@ $view_resp_obj = json_decode($view_response, true);
         
         <button type="submit" class="btn btn-primary" name="submit_order" value="create">Create Order</button>
     </form>
-    
-    <?php endif; ?>
-    
-    
-    
-    <?php if(!empty($_COOKIE["checkout_step2"]) && !empty($create_resp_obj)): ?>
-    
-    <h2>CHECKOUT</h2>
-    <h3>Order id: <?php echo (string)$create_resp_obj->session_order_id ?></h3>
-    <h3>Ship To:</h3>
-    <p>
-        <?php echo $create_resp_obj->customer_info->shipping_address->first_name." ".$create_resp_obj->customer_info->shipping_address->last_name  ?><br />
-        <?php echo $create_resp_obj->customer_info->shipping_address->company_name ?><br />
-        <?php echo $create_resp_obj->customer_info->shipping_address->address1 ?> <?php echo $create_resp_obj->customer_info->shipping_address->address2 ?><br />
-        <?php echo $create_resp_obj->customer_info->shipping_address->city ?>, <?php echo $create_resp_obj->customer_info->shipping_address->state ?>         <?php echo $create_resp_obj->customer_info->shipping_address->postal_code ?>
-    </p>
-    <p><?php echo $create_resp_obj->customer_info->email->email ?></p>
-    <p><?php echo $create_resp_obj->customer_info->phone->country_code ?>-<?php echo $create_resp_obj->customer_info->phone->area_code ?>-<?php echo $create_resp_obj->customer_info->phone->number ?></p>
-    
-    <h3>Order</h3>
-    
-    <table class="table">   
-        <tr>
-            <th></th>
-            <th>Product</th>
-            <th>Part#</th>
-            <th>Retailer</th>
-            <th>Unit Price</th>
-            <th>Qty</th>
-            <th>Price</th>
-        </tr> 
-    <?php foreach($create_resp_obj->order_details->items as $item): ?>
-    <tr>
-        <td><img src="http://leki-store.mwrc.net<?php echo $item->image ?>" style="max-width: 100px; max-height: 100px;" /></td>
-        <td><?php echo $item->name ?></td>
-        <td><?php echo $item->part_number ?></td>
-        <td><?php echo $item->retailer ?></td>
-        <td><?php echo $item->unit_price_formatted ?></td>
-        <td><?php echo $item->quantity ?></td>        
-        <td><?php echo $item->quantity_price_formatted ?></td>
-    </tr>
-    <?php endforeach; ?>
-    </table>
-    
-    <p>
-        Subtotal: <?php echo $create_resp_obj->order_details->totals->subtotal->{0}->formatted ?><br />
-        Shipping: <?php echo $create_resp_obj->order_details->totals->shipping ?><br />
-        Tax: <?php echo $create_resp_obj->order_details->totals->tax ?><br />
-        Total: <?php echo $create_resp_obj->order_details->totals->grand_total ?>
-    </p>
-    
-    <form action="./cart.php" method="post" id="final_checkout" name="final_checkout">
-        
-        <input type="hidden" name="submit_order" value="checkout" />
-        
-        <h3>Enter Billing Address</h3>
-        
-        
-        <h3>Enter Credit Card</h3>
-        
-        <input type="hidden" id="enc_data" name="enc_data" value="" />
-        
-        <div class="form-group">
-            <label for="card_number">Card Number</label>
-            <input type="text" class="form-control" id="card_number" placeholder="Card Number">
-        </div>
-        
-        <div class="form-group">
-            <label for="card_cvv">Card CVV</label>
-            <input type="text" class="form-control" id="card_cvv" placeholder="Card CVV">
-        </div>
-       
-        <div class="form-group">
-            <label for="card_exp_m">Card Exp. MM</label>
-            <select id="card_exp_m" class="form-control">
-                <option value="">MM</option>
-                <?php for($i=1;$i<=12;$i++): ?>
-                <option value="<?php echo $i ?>"><?php echo $i ?></option>
-                <?php endfor; ?>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="card_exp_y">Card Exp. YYYY</label>
-            <select id="card_exp_y" class="form-control">
-                <option value="">YYYY</option>
-                <?php for($i=date("Y"); $i<=date("Y")+10; $i++): ?>
-                <option value="<?php echo $i ?>"><?php echo $i ?></option>
-                <?php endfor; ?>
-            </select>
-        </div>
-    
-        <button type="submit" name="place_order" id="place_order" value="checkout">Place Order</button>
-        
-    </form>
-    
-    <?php endif; ?>
     
 </div>
 
