@@ -1,7 +1,7 @@
 <?php
-require_once("includes/api_functions.inc.php");
-require_once("includes/config.inc.php");
-require_once("includes/functions.inc.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/api_functions.inc.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/config.inc.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/functions.inc.php");
 
 $cat_id = ! empty($_GET['cat_id']) ? $_GET['cat_id'] : 0;
 
@@ -23,7 +23,6 @@ foreach($request_params as $param=>$val) $params[] = $param."=".$val;
 
 //print $cookie_string_for_api;
 
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +30,7 @@ foreach($request_params as $param=>$val) $params[] = $param."=".$val;
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-     <?php require_once("includes/sessions.inc.php"); ?>
+     <?php require_once($_SERVER["DOCUMENT_ROOT"]."/includes/sessions.inc.php"); ?>
     
     <title>Channel Islands - <?php echo (strlen($category->name))?" - ".$category->name:""; ?></title>
 

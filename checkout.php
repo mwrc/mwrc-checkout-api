@@ -3,7 +3,7 @@ require_once("includes/api_functions.inc.php");
 require_once("includes/config.inc.php");
 require_once("includes/functions.inc.php");
 
-$api_endpoint = "http://leki-store.devel2.mwrc.net/services/cart.php"; 
+$api_endpoint = "leki-store.devel2.mwrc.net/services/cart.php"; 
 
 if(count($_POST))
 {
@@ -28,15 +28,19 @@ if(count($_POST))
     $data_string = json_encode( $data );
 // print $api_endpoint."?action=checkout";
     $ch=curl_init();
-	curl_setopt($ch, CURLOPT_URL, $api_endpoint."?action=checkout");
+	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."?action=checkout");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    	
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);	
 	curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
     
     $cookie="";
-	if (!empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
-  	if(!empty($_COOKIE["mwrc_secure_session_code"])) $cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
+	if ( ! empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
+	
+	//Required
+  	if( ! empty($_COOKIE["mwrc_secure_session_code"])) $cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
 
     curl_setopt($ch, CURLOPT_COOKIE, $cookie);  	
     
@@ -65,7 +69,7 @@ if(count($_POST))
 
     
 $ch=curl_init();
-curl_setopt($ch, CURLOPT_URL, $api_endpoint."?action=view");
+curl_setopt($ch, CURLOPT_URL, "http://".$api_endpoint."?action=view");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
@@ -107,7 +111,8 @@ if( ! $create_resp_obj->session_order_id) {
     
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     
-    <script type="text/javascript">
+    <!--
+<script type="text/javascript">
   	  var mwrc_widget_config = {
             "container": ".cart_container", //Define shopping cart widget container
             "template": { // create 'template' object to bypass default output.
@@ -120,6 +125,7 @@ if( ! $create_resp_obj->session_order_id) {
     </script>
     
     <script type="text/javascript" src="http://kotalongboards.mwrc.net/js/cart-widget.js"></script>
+-->
     
     <script language="Javascript" src="https://leki-store.mwrc.net/js/keys/create.js" type="text/javascript"></script>
     <script language="Javascript" src="http://leki-store.devel2.mwrc.net/js/library/MWRCEncrypt.min.js" type="text/javascript"></script>
@@ -158,20 +164,22 @@ if( ! $create_resp_obj->session_order_id) {
 
     <h1>LEKI Shopping Cart</h1>
     
+<!--
         <div class="cart_container">
             <a href="<?php echo $mwrc_retailer_domain ?>/en/shopping-cart.php">
-              <span id="mwrc_cart_qty"></span> items <!-- Example output: 2 -->
-              <span id="mwrc_cart_subtotal"></span> <!-- Example output: $59.99 -->
+              <span id="mwrc_cart_qty"></span> items
+              <span id="mwrc_cart_subtotal"></span>
             </a> | 
             <a href="index.php">Continue Shopping</a>
         </div>
+-->
         
     
     
     <?php if( ! empty($create_resp_obj)): ?>
     
     <h2>CHECKOUT</h2>
-    <h3>Order id: <?php echo (string)$create_resp_obj->session_order_id ?></h3>
+<!--     <h3>Order id: <?php echo (string)$create_resp_obj->session_order_id ?></h3> -->
     
     <h3>Order</h3>
     

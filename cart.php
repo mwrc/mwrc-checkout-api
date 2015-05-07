@@ -3,7 +3,7 @@ require_once("includes/api_functions.inc.php");
 require_once("includes/config.inc.php");
 require_once("includes/functions.inc.php");
 
-$api_endpoint = "http://leki-store.devel2.mwrc.net/services/cart.php"; 
+$api_endpoint = "leki-store.devel2.mwrc.net/services/cart.php"; 
 
 if(count($_POST))
 {
@@ -44,8 +44,10 @@ exit;
         $data_string = json_encode( $data );
 
         $ch=curl_init();
-    	curl_setopt($ch, CURLOPT_URL, $api_endpoint."?action=create");
+    	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."?action=create");
     	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    	
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     	curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
@@ -57,50 +59,24 @@ exit;
     
       	$create_response=curl_exec($ch);	
     	$error = curl_error($ch);
-
         $info = curl_getinfo($ch);
+        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
+    	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    	curl_close($ch);
+    	
+    	        
+        if($error) {
+            print "CURL Error: $error";
+            exit;
+        }
+
     	  	
 /*
         print_r($info);
         print_r($create_response);        
+        print_r($error);
         exit;
 */
-        
-    	$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
-    	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-    	curl_close($ch);
-
-//             header("Content-Type: ".$contentType);
-        //     echo $contentType;
-/*
-        	print "http status:\n";
-        	print $http_status."\n\n";
-        	
-        // 	print "Response: <br />";
-            print $create_response;
-            exit;
-*/
-       
-        
-        	
-        //     $info = curl_getinfo ($ch);	
-        // 	print_r($info);
-        
-        	
-        /*
-        	if ( ! $error) {
-            	print "http status: ".$http_status."<br />";
-            	
-                $json_data = json_decode($response);
-                print "JSON RESP:";
-                print "<pre>";
-                print_r($json_data);
-                print $error;
-        	} else {
-            	print "error";
-                print $error;	
-        	}
-        */
 
     	if($http_status==200) {
         
@@ -121,6 +97,7 @@ exit;
         
     	}
         else {
+            print "HTTP Code: ".$http_status."<br />";
             print "local/cart.php - ".__LINE__;
             print_r($create_response);
             exit;
@@ -138,7 +115,7 @@ exit;
 
     
 $ch=curl_init();
-curl_setopt($ch, CURLOPT_URL, $api_endpoint."?action=view");
+curl_setopt($ch, CURLOPT_URL, "http://".$api_endpoint."?action=view");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
@@ -280,7 +257,7 @@ exit;
 
         <?php else: ?>
 
-        <p class="text-info">Your session does not have any products</p>
+        <p class="text-danger">Your session does not have any products</p>
 
         <?php endif; ?>        
         

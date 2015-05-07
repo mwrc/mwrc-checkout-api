@@ -45,7 +45,6 @@ function curl_get ($mwrc_domain, $mwrc_lang_abbrev, $mwrc_script_name, $mwrc_scr
 
 	if (isset($_COOKIE['mwrc_session_code_1_1'])) {
     	$cookie = "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
-//     	$cookie .= "mwrc_secure_session_code=d0hfKRpFhxWQhUDMAVnT;";
 	    curl_setopt($ch, CURLOPT_COOKIE, $cookie);
     }
 
