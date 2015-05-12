@@ -4,7 +4,7 @@
  * curl_get performs a request on the MWRC server and returns xml
  *
  * @param string $mwrc_domain
- * 		- client's mwrc domain: http://[clients_subdomain].mwrc.net
+ * 		- client's mwrc domain: [clients_subdomain].mwrc.net
  * 
  * @param string $mwrc_lang_abbrev
  * 		- typically: en
@@ -34,9 +34,9 @@ function curl_get ($mwrc_domain, $mwrc_lang_abbrev, $mwrc_script_name, $mwrc_scr
 	$ch=curl_init();
 	
 	if($mwrc_lang_abbrev=="services") {
-        $url = "$mwrc_domain/$mwrc_lang_abbrev/$mwrc_script_name?$mwrc_script_args";    	
+        $url = "http://$mwrc_domain/$mwrc_lang_abbrev/$mwrc_script_name?$mwrc_script_args";    	
 	} else {
-        $url = "$mwrc_domain/xml/$mwrc_lang_abbrev/$mwrc_script_name?$mwrc_script_args";    	
+        $url = "http://$mwrc_domain/xml/$mwrc_lang_abbrev/$mwrc_script_name?$mwrc_script_args";    	
 	}
 // print_r($mwrc_script_args);
 //     print "<pre>".$url."</pre>";

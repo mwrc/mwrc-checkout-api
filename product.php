@@ -204,21 +204,7 @@ if(have_mwrc_session())
     
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="/js/mwrc.productConfigs.js"></script>
-    
-    <script type="text/javascript">
-  	  var mwrc_widget_config = {
-                                "container": ".cart_container", //Define shopping cart widget container
-                                "template": { // create 'template' object to bypass default output.
-                                              "items":"#mwrc_cart_qty", // CSS ID
-                                              "subtotal":"#mwrc_cart_subtotal", //CSS ID
-                                              "checkout_link":"#mwrc_checkout_link", //Your checkout link
-                                              "account_link":"#mwrc_account_link" //Your account link
-                                            }
-                                };
-    </script>
-    
-    <script type="text/javascript" src="http://leki.mwrc.net/js/cart-widget.js"></script>
-    
+        
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     
@@ -299,15 +285,6 @@ $.post("proxy.php?action=view_cart", {}, function(data, stat, jqxhr) {
     
         <h1>Channel Islands</h1>
         
-        <div class="cart_container">
-            <a href="<?php echo $mwrc_retailer_domain ?>/en/shopping-cart.php">
-              <span id="mwrc_cart_qty"></span> items <!-- Example output: 2 -->
-              <span id="mwrc_cart_subtotal"></span> <!-- Example output: $59.99 --> | 
-              <a id="mwrc_checkout_link">Checkout</a> | 
-              <a id="mwrc_account_link">Account</a>
-            </a>
-        </div>
-
 <?php if(!empty($brandProduct)): ?>
 
 <?php if(!empty($parent_cats)): ?>

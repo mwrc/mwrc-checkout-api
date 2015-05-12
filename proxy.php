@@ -21,7 +21,7 @@ if($action == "add_to_cart")
 }
 else if($action == "view")
 {
-    $url = $mwrc_retailer_domain."/services/cart.php?action=cart_summary"; //only quantity and subtotal 
+    $url = "http://".$mwrc_retailer_domain."/services/cart.php?action=cart_summary"; //only quantity and subtotal 
 /*     $url = $mwrc_retailer_domain."/services/cart.php?action=view"; //entire cart */
 }
 
