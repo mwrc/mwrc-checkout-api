@@ -26,6 +26,7 @@ if(count($_POST))
     $data["card"]["card_encrypt"] = stripslashes($_POST["enc_data"]);
             
     $data_string = json_encode( $data );
+
 // print $api_endpoint."?action=checkout";
     $ch=curl_init();
 	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."?action=checkout");
@@ -37,7 +38,7 @@ if(count($_POST))
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
     
     $cookie="";
-	if ( ! empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
+	if( ! empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
 	
 	//Required
   	if( ! empty($_COOKIE["mwrc_secure_session_code"])) $cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
@@ -198,7 +199,7 @@ if( ! $create_resp_obj->session_order_id) {
         <td><img src="http://leki-store.mwrc.net<?php echo $item->image ?>" style="max-width: 100px; max-height: 100px;" /></td>
         <td><?php echo $item->name ?></td>
         <td><?php echo $item->part_number ?></td>
-        <td><?php echo $item->retailer ?></td>
+        <td><?php echo (!empty($item->retailer)) ? $item->retailer : "" ?></td>
         <td><?php echo $item->unit_price_formatted ?></td>
         <td><?php echo $item->quantity ?></td>        
         <td><?php echo $item->quantity_price_formatted ?></td>

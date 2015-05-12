@@ -51,61 +51,75 @@ exit;
     	curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-        
-    	if (isset($_COOKIE['mwrc_session_code_1_1'])) {
-        	$cookie = "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
-    	    curl_setopt($ch, CURLOPT_COOKIE, $cookie);
-        }
+    
+        $cookie="";
+    	if( ! empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
+      	if( ! empty($_COOKIE["mwrc_secure_session_code"])) $cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
+        curl_setopt($ch, CURLOPT_COOKIE, $cookie);  	    
     
       	$create_response=curl_exec($ch);	
     	$error = curl_error($ch);
-        $info = curl_getinfo($ch);
         $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
     	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
     	curl_close($ch);
-    	
     	        
         if($error) {
             print "CURL Error: $error";
             exit;
         }
 
-    	  	
-/*
-        print_r($info);
-        print_r($create_response);        
+        print "\nhttp code:\n";
+        print_r($http_status);
+        
+        print "\ncreate response:\n";
+        print_r($create_response);
+        
+        print "\nerror:\n";
         print_r($error);
-        exit;
+//         exit;
+        
+        $create_resp_obj = json_decode($create_response);
+/*
+        print "===";
+print_r($create_resp_obj);
 */
 
+        /**
+        * These session values do not necessarily need to be stored in cookies.
+        * Preferably, these values would be stored internally using any storage engine of your choice.
+        */
+        if( ! empty($create_resp_obj->session_code)) {
+            setcookie("mwrc_session_code_1_1", $create_resp_obj->session_code, 0, "/");
+        	$_COOKIE["mwrc_session_code_1_1"] = $create_resp_obj->session_code;            
+        }
+
+        if( ! empty($create_resp_obj->secure_session_code)) {
+        	setcookie("mwrc_secure_session_code", $create_resp_obj->secure_session_code, 0, "/");
+        	$_COOKIE["mwrc_secure_session_code"] = $create_resp_obj->secure_session_code;            
+        }
+print_r($_COOKIE);
+exit;
     	if($http_status==200) {
-        
-            $create_resp_obj = json_decode($create_response);
 
             if($create_resp_obj->success==1) {
-                
-                setcookie("mwrc_session_code_1_1", $create_resp_obj->session_code, 0, "/");
-            	$_COOKIE["mwrc_session_code_1_1"] = $create_resp_obj->session_code;
-                
-            	setcookie("mwrc_secure_session_code", $create_resp_obj->secure_session_code, 0, "/");
-            	$_COOKIE["mwrc_secure_session_code"] = $create_resp_obj->secure_session_code;
-        
                 header("Location: /checkout.php");
                 exit;
 
             }
         
     	}
-        else {
+        else {            	            
+/*
             print "HTTP Code: ".$http_status."<br />";
             print "local/cart.php - ".__LINE__;
-            print_r($create_response);
+            print_r($create_resp_obj);
             exit;
+*/
         }
 	
 // 	exit;
 }
-
+// else {
 
 /*
 *
@@ -131,6 +145,10 @@ $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 curl_close($ch);
 
 $view_resp_obj = json_decode($view_response, true);
+
+    
+// }
+
 /*
 print_r($view_resp_obj);
 exit;
@@ -144,7 +162,7 @@ exit;
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-    <?php require_once("includes/sessions.inc.php"); ?>        
+    <?php //require_once("includes/sessions.inc.php"); ?>        
     
     <title>LEKI - Cart</title>
     
@@ -158,6 +176,7 @@ exit;
     
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     
+<!--
     <script type="text/javascript">
   	  var mwrc_widget_config = {
             "container": ".cart_container", //Define shopping cart widget container
@@ -171,6 +190,7 @@ exit;
     </script>
     
     <script type="text/javascript" src="http://kotalongboards.mwrc.net/js/cart-widget.js"></script>
+-->
     
 </head>
 
@@ -193,7 +213,7 @@ exit;
         
         <div class="alert alert-danger" role="alert">
             <?php foreach($create_resp_obj->message->errors as $error): ?>
-            <p><?php echo $error->product_identifier." ".$error->error_msg; ?></p>
+            <p><?php echo $error->error_msg; ?></p>
             <?php endforeach; ?>
         </div>
         
@@ -234,7 +254,7 @@ exit;
                     </ul>                    
                     <?php endif; ?>
                 </td>
-                <td><?php echo $line_item["retailer"] ?></td>
+                <td><?php echo (!empty($line_item["retailer"])?$line_item["retailer"]:"") ?></td>
                 <td><?php echo $line_item["unit_price_formatted"] ?></td>
                 <td><?php echo $line_item["quantity"] ?></td>
                 <td><?php echo $line_item["quantity_price_formatted"] ?></td>
