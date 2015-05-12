@@ -111,23 +111,34 @@ if( ! $create_resp_obj->session_order_id) {
     
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     
+    
+    <!-- Include this JS file - creates the necessary PGP public key to perform encryption -->
     <script language="Javascript" src="https://<?php echo $mwrc_retailer_domain ?>/js/keys/create.js" type="text/javascript"></script>
-    <script language="Javascript" src="http://<?php echo $mwrc_retailer_domain ?>/js/library/MWRCEncrypt.min.js" type="text/javascript"></script>
+    
+    <!-- Include MWRCEncrypt library file  -->
+    <script language="Javascript" src="https://<?php echo $mwrc_retailer_domain ?>/js/library/MWRCEncrypt.min.js" type="text/javascript"></script>
     
     <script language="Javascript" type="text/javascript">
         
     $(document).ready(function (){
 
+        // Intercept the form submission in order to encrypt the credit card information
         $('#place_order').click(function(e) {
         
+            //Get the credit details directly from the form inputs
             var cc_num = $('#card_number').val();
             var cc_cvv = $('#card_cvv').val();
             var cc_exp_m = $('#card_exp_m').val();
             var cc_exp_y = $('#card_exp_y').val();
         
+            // Pass the credit card details to the encrypt() method. Encrypted card data created and stored within the lirbary object
             if(MWRCEncrypt.encrypt(cc_num, cc_cvv, cc_exp_m, cc_exp_y)) {
-               MWRCEncrypt.updateForm('enc_data');
-               $('#final_checkout').submit();
+                
+                // Update the form with the encrypted card data. Pass the hidden fields id attribute.
+                MWRCEncrypt.updateForm('enc_data');
+                
+                // Finally, submit the form for processing...
+                $('#final_checkout').submit();
             } else {
                 throw "Unable to encrypt credit card data.";
             }
@@ -266,16 +277,19 @@ if( ! $create_resp_obj->session_order_id) {
         
         <div class="form-group">
             <label for="card_number">Card Number</label>
+            <!-- This input field must not have the name attribute so that it is not submiited with the form --> 
             <input type="text" class="form-control" id="card_number" placeholder="Card Number" maxlength="16">
         </div>
         
         <div class="form-group">
             <label for="card_cvv">Card CVV</label>
+            <!-- This input field must not have the name attribute so that it is not submiited with the form -->             
             <input type="text" class="form-control" id="card_cvv" placeholder="Card CVV" maxlength="4">
         </div>
        
         <div class="form-group">
             <label for="card_exp_m">Card Exp. MM</label>
+            <!-- This input field must not have the name attribute so that it is not submiited with the form -->             
             <select id="card_exp_m" class="form-control">
                 <option value="">MM</option>
                 <?php for($i=1;$i<=12;$i++): ?>
@@ -286,6 +300,7 @@ if( ! $create_resp_obj->session_order_id) {
         
         <div class="form-group">
             <label for="card_exp_y">Card Exp. YYYY</label>
+            <!-- This input field must not have the name attribute so that it is not submiited with the form -->             
             <select id="card_exp_y" class="form-control">
                 <option value="">YYYY</option>
                 <?php for($i=date("Y"); $i<=date("Y")+10; $i++): ?>

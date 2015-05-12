@@ -26,7 +26,7 @@ There are also some input fields listed below to mass add products to your sessi
 
 This page is the final page/step in the ordering process. This page is displayed to the customer after the mass add to cart (Create Shopping Cart) feature was successful.
 
-Summary of the shopping cart is displayed, billing information (address, credit card) input fields are required. Credit card details must be passed encrypted and follow the instructions from the [MWRCEncrypt integration](/) page.
+Summary of the shopping cart is displayed, billing information (address, credit card) input fields are required. Credit card details must be passed encrypted and follow the instructions from the [MWRCEncrypt integration](https://github.com/mwrc/mwrc-checkout-api-example/wiki/MWRCEncrypt-Integration) page.
 
 Upon a successful place order request an order id is returned and the customer can be redirected to a confirmation page.
 
