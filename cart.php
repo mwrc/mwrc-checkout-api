@@ -13,34 +13,22 @@ print_r($_POST);
 print "</pre>";
 exit;
 */
-        $data = array();
+        extract($_POST);
         
-        $data["email"]["email"] = "dan@formula23.com";
-        $data["email"]["optin"] = "yes";
+        ///DO validation...
         
-        $data["phone"]["country_code"] = "1";
-        $data["phone"]["area_code"] = "310";
-        $data["phone"]["number"] = "6004938";    
-        $data["phone"]["extension"] = "";
-        $data["phone"]["description"] = "Mobile";
-        $data["phone"]["optin"] = "yes";
-    
-        $data["shipping"]["first_name"] = "Dan";
-        $data["shipping"]["last_name"] = "Schultz";
-        $data["shipping"]["company_name"] = "API TEST";
-        $data["shipping"]["address1"] = "101 Test Ave";
-        $data["shipping"]["address2"] = "#807";
-        $data["shipping"]["city"] = "Culver City";
-        $data["shipping"]["state"] = "CA";
-        $data["shipping"]["postal_code"] = "90230";
-        $data["shipping"]["country"] = "US";
+        //Populate form post
+        $data = array();        
+        $data["email"] = $email;
+        $data["phone"] = $phone;
+        $data["shipping"] = $shipping;
 
         foreach($_POST["items"] as $item) {
             if( ! empty($item["full_sku"]) && (int)$item["quantity"] > 0) {
                 $data["items"][] = $item;
             }
         }
-            
+
         $data_string = json_encode( $data );
 
         $ch=curl_init();
@@ -58,6 +46,10 @@ exit;
         curl_setopt($ch, CURLOPT_COOKIE, $cookie);  	    
     
       	$create_response=curl_exec($ch);	
+/*
+      	print_r($create_response);
+      	exit;
+*/
     	$error = curl_error($ch);
         $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
     	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -68,6 +60,7 @@ exit;
             exit;
         }
 
+/*
         print "\nhttp code:\n";
         print_r($http_status);
         
@@ -76,29 +69,27 @@ exit;
         
         print "\nerror:\n";
         print_r($error);
+*/
 //         exit;
         
         $create_resp_obj = json_decode($create_response);
-/*
-        print "===";
-print_r($create_resp_obj);
-*/
-
+//         print "===";
+// print_r($create_resp_obj);
+// exit;
         /**
         * These session values do not necessarily need to be stored in cookies.
         * Preferably, these values would be stored internally using any storage engine of your choice.
         */
-        if( ! empty($create_resp_obj->session_code)) {
-            setcookie("mwrc_session_code_1_1", $create_resp_obj->session_code, 0, "/");
-        	$_COOKIE["mwrc_session_code_1_1"] = $create_resp_obj->session_code;            
+        if( ! empty($create_resp_obj->meta->session_code)) {
+            setcookie("mwrc_session_code_1_1", $create_resp_obj->meta->session_code, 0, "/");
+        	$_COOKIE["mwrc_session_code_1_1"] = $create_resp_obj->meta->session_code;            
         }
 
-        if( ! empty($create_resp_obj->secure_session_code)) {
-        	setcookie("mwrc_secure_session_code", $create_resp_obj->secure_session_code, 0, "/");
-        	$_COOKIE["mwrc_secure_session_code"] = $create_resp_obj->secure_session_code;            
+        if( ! empty($create_resp_obj->meta->secure_session_code)) {
+        	setcookie("mwrc_secure_session_code", $create_resp_obj->meta->secure_session_code, 0, "/");
+        	$_COOKIE["mwrc_secure_session_code"] = $create_resp_obj->meta->secure_session_code;            
         }
-print_r($_COOKIE);
-exit;
+
     	if($http_status==200) {
 
             if($create_resp_obj->success==1) {
@@ -139,15 +130,16 @@ if (isset($_COOKIE['mwrc_session_code_1_1'])) {
 }
 
 $view_response=curl_exec($ch);	
+/*
+print_r($view_response);
+exit;
+*/
 $error = curl_error($ch);
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
 $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 curl_close($ch);
 
 $view_resp_obj = json_decode($view_response, true);
-
-    
-// }
 
 /*
 print_r($view_resp_obj);
@@ -286,6 +278,7 @@ exit;
     <h2>Add items to your cart</h2>
     <p>Fill out the form below and submit to add products to create a new shopping cart/order</p>
     <p>If zip code is not provided, retailer will default to distribution center</p>
+        
     <form action="./cart.php" method="post">
 
         <table class="table">
@@ -315,6 +308,130 @@ exit;
             
             </tbody>
         </table>
+        
+        <hr/>
+        
+        <h3>Email Address</h3>
+
+        <div class="row">
+            <div class="col-md-6">
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" name="email[email]" placeholder="Enter email">
+              </div>
+                
+            </div>
+            <div class="col-md-6">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="email[optin]" value="1"> Yes, use this e-mail address to send me e-mail updates on new products, promotions and events.
+                </label>
+              </div>
+                
+            </div>            
+        </div>        
+        
+        <hr/>
+        
+        <h3>Phone Number</h3>
+
+        <div class="row">
+            <div class="col-md-2">
+                <label for="description">Description</label>                
+                <select class="form-control" id="description" name="phone[description]">
+                  <option value="">Description</option>
+                  <option value="Mobile" selected="selected">Mobile</option>
+                  <option value="Home">Home</option>
+                  <option value="Work">Work</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="country_code">Country Code</label>                
+                <select class="form-control" id="country_code" name="phone[country_code]">
+                  <option value="">Country Code</option>
+                  <option value="1" selected="selected">US +1</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="area_code">Area Code</label>
+                    <input type="text" class="form-control" id="area_code" placeholder="Area Code" name="phone[area_code]">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="number">Number</label>
+                    <input type="text" class="form-control" id="number" placeholder="Number" name="phone[number]">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label>
+                  <input type="checkbox" name="phone[optin]" value="1"> Yes, use my number to send me text updates on new products, promotions and events.
+                </label>                
+            </div>
+        </div>
+        
+        <hr/>
+        
+        <h3>Shipping Address</h3>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="company_name">Company Name</label>
+                    <input type="text" class="form-control" id="company_name" placeholder="Company Name" name="shipping[company_name]">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" class="form-control" id="first_name" placeholder="First Name" name="shipping[first_name]" value="John">
+                </div>
+
+
+                <div class="form-group">
+                    <label for="address1">Address 1</label>
+                    <input type="text" class="form-control" id="address1" placeholder="Address 1" name="shipping[address1]" value="1234 Test Ave.">
+                </div>
+
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" id="city" placeholder="city" name="shipping[city]" value="Culver City">
+                </div>
+
+                <div class="form-group">
+                    <label for="postal_code">Zip</label>
+                    <input type="text" class="form-control" id="postal_code" placeholder="postal_code" name="shipping[postal_code]" value="90230">
+                </div>
+                
+            </div>
+            <div class="col-md-6">
+                
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" placeholder="Last Name" name="shipping[last_name]" value="Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address1">Address 2</label>
+                    <input type="text" class="form-control" id="address2" placeholder="Address 2" name="shipping[address2]">
+                </div>
+
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" id="state" placeholder="state" name="shipping[state]" value="CA">
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" class="form-control" id="country" placeholder="country" name="shipping[country]" value="US">
+                </div>
+                
+            </div>
+        </div>
         
         <button type="submit" class="btn btn-primary" name="submit_order" value="create">Create Order</button>
     </form>
