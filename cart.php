@@ -185,11 +185,19 @@ if(empty($_COOKIE["mwrc_session_code_1_1"]) && ! empty($view_resp_obj["meta"]["s
         <hr />
         
         <?php if( ! empty($create_resp_obj->message->errors)): ?>
+        <pre>Response:<br><?php print_r($create_response) ?></pre>
         
         <div class="alert alert-danger" role="alert">
-            <?php foreach($create_resp_obj->message->errors as $error): ?>
-            <p><?php echo $error->error_msg; ?></p>
-            <?php endforeach; ?>
+            <?php if($create_resp_obj->error_type == "Input"): ?>
+            
+                <?php foreach($create_resp_obj->message->errors as $error): ?>
+                <p><?php echo $error->error_msg; ?></p>
+                <?php endforeach; ?>
+                
+            <?php else: ?>
+            <p>There was an error, please try again.</p>            
+            <?php endif; ?>
+            
         </div>
         
         <?php endif; ?>
