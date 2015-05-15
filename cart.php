@@ -46,10 +46,6 @@ exit;
         curl_setopt($ch, CURLOPT_COOKIE, $cookie);  	    
     
       	$create_response=curl_exec($ch);	
-/*
-      	print_r($create_response);
-      	exit;
-*/
     	$error = curl_error($ch);
         $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
     	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -59,6 +55,11 @@ exit;
             print "CURL Error: $error";
             exit;
         }
+/*
+      	print "create";
+      	print_r($create_response);
+      	exit;
+*/
 
 /*
         print "\nhttp code:\n";
@@ -73,9 +74,7 @@ exit;
 //         exit;
         
         $create_resp_obj = json_decode($create_response);
-//         print "===";
-// print_r($create_resp_obj);
-// exit;
+     
         /**
         * These session values do not necessarily need to be stored in cookies.
         * Preferably, these values would be stored internally using any storage engine of your choice.
@@ -165,24 +164,6 @@ exit;
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     
     <link rel="stylesheet" type="text/css" href="css/main.css" media="all" charset="utf-8" />
-    
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    
-<!--
-    <script type="text/javascript">
-  	  var mwrc_widget_config = {
-            "container": ".cart_container", //Define shopping cart widget container
-            "template": { // create 'template' object to bypass default output.
-                          "items":"#mwrc_cart_qty", // CSS ID
-                          "subtotal":"#mwrc_cart_subtotal", //CSS ID
-                          "checkout_link":"#mwrc_checkout_link", //Your checkout link
-                          "account_link":"#mwrc_account_link" //Your account link
-                        }
-            };
-    </script>
-    
-    <script type="text/javascript" src="http://kotalongboards.mwrc.net/js/cart-widget.js"></script>
--->
     
 </head>
 
@@ -436,8 +417,8 @@ exit;
         <button type="submit" class="btn btn-primary" name="submit_order" value="create">Create Order</button>
     </form>
     
-</div>
-
+</div>    
+    
 </body>
 
 </html>

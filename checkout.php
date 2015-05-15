@@ -109,48 +109,6 @@ if( ! $create_resp_obj->session_order_id) {
     
     <link rel="stylesheet" type="text/css" href="/css/main.css" media="all" charset="utf-8" />
     
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    
-    
-    <!-- Include this JS file - creates the necessary PGP public key to perform encryption -->
-    <script language="Javascript" src="https://<?php echo $mwrc_retailer_domain ?>/js/keys/create.js" type="text/javascript"></script>
-    
-    <!-- Include MWRCEncrypt library file  -->
-    <script language="Javascript" src="https://<?php echo $mwrc_retailer_domain ?>/js/library/MWRCEncrypt.min.js" type="text/javascript"></script>
-    
-    <script language="Javascript" type="text/javascript">
-        
-    $(document).ready(function (){
-
-        // Intercept the form submission in order to encrypt the credit card information
-        $('#place_order').click(function(e) {
-        
-            //Get the credit details directly from the form inputs
-            var cc_num = $('#card_number').val();
-            var cc_cvv = $('#card_cvv').val();
-            var cc_exp_m = $('#card_exp_m').val();
-            var cc_exp_y = $('#card_exp_y').val();
-        
-            // Pass the credit card details to the encrypt() method. Encrypted card data created and stored within the lirbary object
-            if(MWRCEncrypt.encrypt(cc_num, cc_cvv, cc_exp_m, cc_exp_y)) {
-                
-                // Update the form with the encrypted card data. Pass the hidden fields id attribute.
-                MWRCEncrypt.updateForm('enc_data');
-                
-                // Finally, submit the form for processing...
-                $('#final_checkout').submit();
-            } else {
-                throw "Unable to encrypt credit card data.";
-            }
-            
-            return false;
-            
-        });
-        
-    });
-
-    </script>
-
 </head>
 
 <body>
@@ -316,6 +274,47 @@ if( ! $create_resp_obj->session_order_id) {
     <?php endif; ?>
     
 </div>
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        
+<!-- Include this JS file - creates the necessary PGP public key to perform encryption -->
+<script language="Javascript" src="https://<?php echo $mwrc_retailer_domain ?>/js/keys/create.js" type="text/javascript"></script>
+
+<!-- Include MWRCEncrypt library file  -->
+<script language="Javascript" src="https://<?php echo $mwrc_retailer_domain ?>/js/library/MWRCEncrypt.min.js" type="text/javascript"></script>
+
+<script language="Javascript" type="text/javascript">
+    
+$(document).ready(function (){
+
+    // Intercept the form submission in order to encrypt the credit card information
+    $('#place_order').click(function(e) {
+    
+        //Get the credit details directly from the form inputs
+        var cc_num = $('#card_number').val();
+        var cc_cvv = $('#card_cvv').val();
+        var cc_exp_m = $('#card_exp_m').val();
+        var cc_exp_y = $('#card_exp_y').val();
+    
+        // Pass the credit card details to the encrypt() method. Encrypted card data created and stored within the lirbary object
+        if(MWRCEncrypt.encrypt(cc_num, cc_cvv, cc_exp_m, cc_exp_y)) {
+            
+            // Update the form with the encrypted card data. Pass the hidden fields id attribute.
+            MWRCEncrypt.updateForm('enc_data');
+            
+            // Finally, submit the form for processing...
+            $('#final_checkout').submit();
+        } else {
+            throw "Unable to encrypt credit card data.";
+        }
+        
+        return false;
+        
+    });
+    
+});
+
+</script>
 
 </body>
 
