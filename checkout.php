@@ -125,7 +125,7 @@ if( ! $create_resp_obj->session_order_id) {
     <h1>LEKI Shopping Cart</h1>
     
     <?php if( ! empty($checkout_resp_obj->message->errors)): ?>
-    <pre><?php print_r($checkout_response) ?></pre>
+    <pre>Response:<br><?php print $checkout_response ?></pre>
     <div class="alert alert-danger" role="alert">
         <?php foreach($checkout_resp_obj->message->errors as $error): ?>
         <p><?php echo $error->error_msg; ?></p>
