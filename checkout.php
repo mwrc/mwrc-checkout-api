@@ -52,13 +52,20 @@ if(count($_POST))
 	$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
 	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 	curl_close($ch);
-	
-	
-//     print_r($info);
+/*
+print "||";
     print_r($checkout_response);
-    exit;
+*/
+    
+    $checkout_resp_obj = json_decode($checkout_response);
+    
+    if($http_status==200 && $checkout_resp_obj->success==1) {
 
-	
+        header("Location: /confirmation.php?order_id=".$checkout_resp_obj->order_id);
+        exit;
+    
+	}
+
 }
 
 /*
@@ -97,7 +104,7 @@ if( ! $create_resp_obj->session_order_id) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
-    <?php require_once("includes/sessions.inc.php"); ?>        
+    <?php //require_once("includes/sessions.inc.php"); ?>        
     
     <title>LEKI - Cart</title>
     
@@ -116,6 +123,18 @@ if( ! $create_resp_obj->session_order_id) {
 <div class="container">
 
     <h1>LEKI Shopping Cart</h1>
+    
+    <?php if( ! empty($checkout_resp_obj->message->errors)): ?>
+    <pre><?php print_r($checkout_response) ?></pre>
+    <div class="alert alert-danger" role="alert">
+        <?php foreach($checkout_resp_obj->message->errors as $error): ?>
+        <p><?php echo $error->error_msg; ?></p>
+        <?php endforeach; ?>
+    </div>
+    
+    <?php endif; ?>
+
+
     
     <?php if( ! empty($create_resp_obj)): ?>
     

@@ -55,6 +55,8 @@ exit;
             print "CURL Error: $error";
             exit;
         }
+        
+//       	print_r($create_response);        
 /*
       	print "create";
       	print_r($create_response);
@@ -74,7 +76,7 @@ exit;
 //         exit;
         
         $create_resp_obj = json_decode($create_response);
-     
+//      print_r($create_resp_obj);
         /**
         * These session values do not necessarily need to be stored in cookies.
         * Preferably, these values would be stored internally using any storage engine of your choice.
@@ -140,10 +142,10 @@ curl_close($ch);
 
 $view_resp_obj = json_decode($view_response, true);
 
-/*
-print_r($view_resp_obj);
-exit;
-*/
+if(empty($_COOKIE["mwrc_session_code_1_1"]) && ! empty($view_resp_obj["meta"]["session_code"])) {
+    setcookie("mwrc_session_code_1_1", $view_resp_obj["meta"]["session_code"], 0, "/");
+	$_COOKIE["mwrc_session_code_1_1"] = $view_resp_obj["meta"]["session_code"];            
+}
 
 ?>
 
