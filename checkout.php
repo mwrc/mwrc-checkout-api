@@ -3,7 +3,43 @@ require_once("includes/api_functions.inc.php");
 require_once("includes/config.inc.php");
 require_once("includes/functions.inc.php");
 
-$api_endpoint = $mwrc_retailer_domain."/services/cart.php"; 
+$api_endpoint = $mwrc_retailer_domain."/services"; 
+
+if(isset($_GET['shipping_method_group_id'])) {
+    
+    $data=array();
+    $data['action'] = 'save_shipping_option';
+    $data['shipping_method_group_id'] = $_GET['shipping_method_group_id'];
+    
+    $data_string = json_encode( $data );
+
+    $ch=curl_init();
+	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."/shipping.php");
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    	
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);	
+	curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+
+    $cookie="";
+	if( ! empty($_COOKIE['mwrc_session_code_1_1'])) $cookie .= "mwrc_session_code_1_1=".$_COOKIE['mwrc_session_code_1_1'].";";
+	
+	//Required
+  	if( ! empty($_COOKIE["mwrc_secure_session_code"])) $cookie .= "mwrc_secure_session_code=".$_COOKIE["mwrc_secure_session_code"].";";
+
+    curl_setopt($ch, CURLOPT_COOKIE, $cookie);  	
+    
+  	$save_ship_response=curl_exec($ch);	
+	$error = curl_error($ch);
+	  	
+    $info = curl_getinfo($ch);
+    
+	$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
+	$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+	curl_close($ch);
+    header("Location: checkout.php");
+    exit;    
+}
 
 if(count($_POST))
 {
@@ -28,7 +64,7 @@ if(count($_POST))
     $data_string = json_encode( $data );
 
     $ch=curl_init();
-	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."?action=checkout");
+	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."/cart.php?action=checkout");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    	
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);	
@@ -76,7 +112,8 @@ print "||";
 
     
 $ch=curl_init();
-curl_setopt($ch, CURLOPT_URL, "http://".$api_endpoint."?action=view");
+
+curl_setopt($ch, CURLOPT_URL, "http://".$api_endpoint."/cart.php?action=view");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
@@ -86,13 +123,15 @@ if (isset($_COOKIE['mwrc_session_code_1_1'])) {
 }
 
 $view_response=curl_exec($ch);	
+
 $error = curl_error($ch);
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
 $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 curl_close($ch);
 
 $create_resp_obj = json_decode($view_response);
-
+print_r($create_resp_obj);
+exit;
 if( ! $create_resp_obj->session_order_id) {
     header("Location: cart.php");
     exit;   
@@ -171,6 +210,15 @@ if( ! $create_resp_obj->session_order_id) {
         Tax: <?php echo $create_resp_obj->cart_summary->totals->tax ?><br />
         Total: <?php echo $create_resp_obj->cart_summary->totals->grand_total ?>
     </p>
+    
+    <h3>Shipping Options</h3>
+    <select name="shipping_method_group_id" id="shipping_method_group_id" onchange="window.location = '/checkout.php?shipping_method_group_id='+this.options[this.selectedIndex].value">
+        <option value="">--Select--</option>
+        <?php foreach($create_resp_obj->shipping_options as $shipping_option): ?>
+        <option value="<?php echo $shipping_option->shipping_method_group_id ?>"><?php echo $shipping_option->shipping_method_group_name ?> - <?php echo $shipping_option->shipping_amount ?></option>
+        <?php endforeach; ?>
+        
+    </select>
     
     <form action="./checkout.php" method="post" id="final_checkout" name="final_checkout">
         

@@ -30,7 +30,11 @@ exit;
         }
 
         $data_string = json_encode( $data );
-
+        
+/*
+print_r($data_string);
+exit;
+*/
         $ch=curl_init();
     	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."?action=create");
     	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -76,7 +80,7 @@ exit;
 //         exit;
         
         $create_resp_obj = json_decode($create_response);
-//      print_r($create_resp_obj);
+
         /**
         * These session values do not necessarily need to be stored in cookies.
         * Preferably, these values would be stored internally using any storage engine of your choice.
@@ -131,10 +135,8 @@ if (isset($_COOKIE['mwrc_session_code_1_1'])) {
 }
 
 $view_response=curl_exec($ch);	
-/*
 print_r($view_response);
-exit;
-*/
+// exit;
 $error = curl_error($ch);
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);  	
 $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
