@@ -8,13 +8,12 @@ $api_endpoint = $mwrc_retailer_domain."/services";
 if(isset($_GET['shipping_method_group_id'])) {
     
     $data=array();
-    $data['action'] = 'save_shipping_option';
     $data['shipping_method_group_id'] = $_GET['shipping_method_group_id'];
     
     $data_string = json_encode( $data );
 
     $ch=curl_init();
-	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."/shipping.php");
+	curl_setopt($ch, CURLOPT_URL, "https://".$api_endpoint."/shipping.php?action=save_shipping_option");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    	
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);	
@@ -130,8 +129,10 @@ $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 curl_close($ch);
 
 $create_resp_obj = json_decode($view_response);
+/*
 print_r($create_resp_obj);
 exit;
+*/
 if( ! $create_resp_obj->session_order_id) {
     header("Location: cart.php");
     exit;   
